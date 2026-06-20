@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Features – CropAI Smart Farming Platform</title>
+  <meta name="description" content="Explore CropAI's powerful AI-driven features for crop disease detection, real-time analysis, geolocation, and treatment recommendations.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --green-900: #052e16; --green-800: #14532d; --green-700: #15803d;
+      --green-600: #16a34a; --green-500: #22c55e; --green-400: #4ade80;
+      --green-300: #86efac; --accent: #a3e635;
+      --bg-dark: #060f0a; --bg-card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08); --text-primary: #f0fdf4; --text-secondary: #a1a1aa;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Inter', sans-serif; background: var(--bg-dark); color: var(--text-primary); overflow-x: hidden; }
+
+    /* NAV */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 60px;
+      background: rgba(6,15,10,0.8); backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+    }
+    .nav-logo {
+      font-size: 1.6rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--green-400), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.95rem; font-weight: 500; transition: color 0.2s;
+    }
+    .nav-links a:hover, .nav-links a.active { color: var(--green-400); }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--green-600), var(--green-500));
+      color: white !important; padding: 10px 24px; border-radius: 50px; font-weight: 600 !important;
+    }
+
+    /* PAGE HERO */
+    .page-hero {
+      padding: 160px 60px 80px;
+      text-align: center; position: relative; overflow: hidden;
+      background: radial-gradient(ellipse at 50% 0%, rgba(20,83,45,0.5), transparent 65%);
+    }
+    #bgCanvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+    .page-hero > * { position: relative; z-index: 1; }
+    .page-tag {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3);
+      color: var(--green-400); padding: 8px 18px; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .page-hero h1 {
+      font-size: clamp(2.5rem, 5vw, 4rem); font-weight: 900;
+      letter-spacing: -2px; line-height: 1.1; margin-bottom: 20px;
+    }
+    .page-hero h1 span {
+      background: linear-gradient(135deg, var(--green-400), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .page-hero p { color: var(--text-secondary); font-size: 1.1rem; max-width: 560px; margin: 0 auto; }
+
+    /* MAIN FEATURES GRID */
+    .main-features { padding: 80px 60px; max-width: 1200px; margin: 0 auto; }
+    .features-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feat-card {
+      background: var(--bg-card); border: 1px solid var(--border); border-radius: 24px;
+      padding: 36px 32px; transition: all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+      position: relative; overflow: hidden; cursor: default;
+    }
+    .feat-card::after {
+      content: ''; position: absolute; bottom: 0; left: 0; right: 0;
+      height: 3px; background: linear-gradient(90deg, var(--green-500), var(--accent));
+      transform: scaleX(0); transition: transform 0.4s; transform-origin: left;
+    }
+    .feat-card:hover { transform: translateY(-10px); border-color: rgba(34,197,94,0.3); box-shadow: 0 30px 60px rgba(0,0,0,0.4); }
+    .feat-card:hover::after { transform: scaleX(1); }
+    .feat-card-icon {
+      width: 64px; height: 64px; border-radius: 18px; margin-bottom: 24px;
+      background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.03));
+      border: 1px solid rgba(34,197,94,0.25);
+      display: flex; align-items: center; justify-content: center; font-size: 2rem;
+    }
+    .feat-card h3 { font-size: 1.2rem; font-weight: 700; margin-bottom: 12px; }
+    .feat-card p { color: var(--text-secondary); font-size: 0.92rem; line-height: 1.7; }
+    .feat-card .tag {
+      display: inline-block; margin-top: 20px;
+      background: rgba(34,197,94,0.1); color: var(--green-400);
+      padding: 4px 12px; border-radius: 50px; font-size: 0.75rem; font-weight: 600;
+    }
+    .feat-card.large { grid-column: span 2; }
+
+    /* HOW IT WORKS */
+    .workflow { padding: 80px 60px; background: rgba(255,255,255,0.01); border-top: 1px solid var(--border); }
+    .workflow-inner { max-width: 1100px; margin: 0 auto; }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .section-tag { display: inline-block; color: var(--green-400); font-size: 0.8rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+    .section-title { font-size: clamp(2rem, 3.5vw, 2.8rem); font-weight: 800; letter-spacing: -1px; }
+    .section-title span { background: linear-gradient(135deg, var(--green-400), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .steps { display: flex; gap: 0; position: relative; }
+    .steps::before {
+      content: ''; position: absolute; top: 40px; left: 10%; right: 10%;
+      height: 1px; background: linear-gradient(90deg, transparent, rgba(34,197,94,0.3), transparent);
+    }
+    .step { flex: 1; text-align: center; padding: 32px 24px; position: relative; z-index: 1; }
+    .step-num {
+      width: 80px; height: 80px; margin: 0 auto 20px;
+      border-radius: 50%; display: flex; align-items: center; justify-content: center;
+      font-size: 2rem; position: relative;
+      background: radial-gradient(circle, rgba(20,83,45,0.8), rgba(6,15,10,0.9));
+      border: 2px solid rgba(34,197,94,0.4);
+      box-shadow: 0 0 30px rgba(34,197,94,0.15);
+    }
+    .step-num .badge {
+      position: absolute; top: -6px; right: -6px;
+      width: 24px; height: 24px; border-radius: 50%;
+      background: var(--green-500); color: white;
+      font-size: 0.7rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .step h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 8px; }
+    .step p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* TECH CANVAS */
+    .tech-section {
+      padding: 80px 60px; max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .canvas-panel {
+      height: 380px; border-radius: 24px; overflow: hidden;
+      border: 1px solid var(--border); position: relative;
+      background: rgba(255,255,255,0.02);
+    }
+    #techCanvas { width: 100%; height: 100%; }
+    .tech-label {
+      position: absolute; bottom: 20px; left: 20px;
+      background: rgba(6,15,10,0.9); border: 1px solid rgba(34,197,94,0.3);
+      color: var(--green-400); padding: 8px 16px; border-radius: 10px;
+      font-size: 0.8rem; font-weight: 600;
+    }
+    .tech-info .section-tag { display: block; margin-bottom: 12px; }
+    .tech-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 32px; }
+    .t-stat { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; }
+    .t-stat .val { font-size: 1.8rem; font-weight: 800; color: var(--green-400); }
+    .t-stat .lbl { font-size: 0.8rem; color: var(--text-secondary); margin-top: 4px; }
+
+    /* BENEFITS */
+    .benefits { padding: 80px 60px 120px; }
+    .benefits-inner { max-width: 1100px; margin: 0 auto; }
+    .benefits-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-top: 48px; }
+    .benefit-item {
+      display: flex; gap: 20px; align-items: flex-start;
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 18px; padding: 28px; transition: all 0.3s;
+    }
+    .benefit-item:hover { border-color: rgba(34,197,94,0.3); transform: translateX(6px); }
+    .benefit-icon {
+      width: 48px; height: 48px; flex-shrink: 0; border-radius: 12px;
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.2);
+      display: flex; align-items: center; justify-content: center; font-size: 1.4rem;
+    }
+    .benefit-text h4 { font-size: 1rem; font-weight: 700; margin-bottom: 6px; }
+    .benefit-text p { font-size: 0.875rem; color: var(--text-secondary); line-height: 1.6; }
+
+    /* FOOTER */
+    footer { background: rgba(0,0,0,0.4); border-top: 1px solid var(--border); padding: 60px; text-align: center; }
+    .footer-logo { font-size: 1.8rem; font-weight: 800; margin-bottom: 12px; background: linear-gradient(135deg, var(--green-400), var(--accent)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    .footer-links { display: flex; justify-content: center; gap: 32px; margin: 16px 0 24px; list-style: none; }
+    .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--green-400); }
+    .footer-copy { font-size: 0.85rem; color: #52525b; }
+
+    .reveal { opacity: 0; transform: translateY(36px); transition: all 0.7s cubic-bezier(0.16,1,0.3,1); }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .page-hero { padding: 120px 24px 60px; }
+      .main-features, .workflow, .benefits { padding: 60px 24px; }
+      .features-grid { grid-template-columns: 1fr; }
+      .feat-card.large { grid-column: span 1; }
+      .steps { flex-direction: column; gap: 24px; }
+      .steps::before { display: none; }
+      .tech-section { grid-template-columns: 1fr; padding: 60px 24px; gap: 40px; }
+      .benefits-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">🌱 CropAI</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="features.html" class="active">Features</a></li>
+    <li><a href="aicrop.html">AI Detection</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="aicrop.html" class="nav-cta">Try for Free →</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HERO -->
+<section class="page-hero">
+  <canvas id="bgCanvas"></canvas>
+  <div class="page-tag">🌿 Platform Features</div>
+  <h1>Powerful <span>AI Features</span> for<br>Modern Farming</h1>
+  <p>Everything you need to detect, analyze, and treat crop diseases — powered by state-of-the-art artificial intelligence.</p>
+</section>
+
+<!-- MAIN FEATURES -->
+<section class="main-features">
+  <div class="features-grid">
+    <div class="feat-card large reveal">
+      <div class="feat-card-icon">🤖</div>
+      <h3>Deep Learning AI Engine</h3>
+      <p>Our core AI model uses convolutional neural networks trained on 50,000+ crop disease images across 20+ plant species. It achieves industry-leading 95.4% accuracy with real-time inference — giving you reliable results within seconds of upload.</p>
+      <span class="tag">Core Technology</span>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-card-icon">📷</div>
+      <h3>Camera & Gallery Upload</h3>
+      <p>Capture directly from your device camera or upload from gallery. Supports JPEG, PNG, WebP formats.</p>
+      <span class="tag">Input Methods</span>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-card-icon">⚡</div>
+      <h3>3-Second Analysis</h3>
+      <p>Edge-optimized AI pipeline delivers disease detection results in under 3 seconds — even on mobile networks.</p>
+      <span class="tag">Performance</span>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-card-icon">📍</div>
+      <h3>Geolocation Tracking</h3>
+      <p>GPS-powered location tagging links your analysis to specific farm coordinates for regional disease mapping.</p>
+      <span class="tag">Location Intelligence</span>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-card-icon">💊</div>
+      <h3>Treatment Recommendations</h3>
+      <p>Every detection comes with a tailored treatment plan including organic and chemical options with dosage guidance.</p>
+      <span class="tag">Actionable Insights</span>
+    </div>
+    <div class="feat-card reveal">
+      <div class="feat-card-icon">📊</div>
+      <h3>Confidence Scoring</h3>
+      <p>Visual confidence meters show prediction reliability. Multiple disease candidates ranked by probability score.</p>
+      <span class="tag">Transparency</span>
+    </div>
+  </div>
+</section>
+
+<!-- HOW IT WORKS -->
+<section class="workflow">
+  <div class="workflow-inner">
+    <div class="section-header reveal">
+      <div class="section-tag">— How It Works</div>
+      <h2 class="section-title">From Photo to <span>Diagnosis</span> in 4 Steps</h2>
+    </div>
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-num">📷<span class="badge">1</span></div>
+        <h3>Capture</h3>
+        <p>Take a clear photo of the affected crop leaf or stem using your mobile camera or upload from gallery.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">☁️<span class="badge">2</span></div>
+        <h3>Upload</h3>
+        <p>Your image is securely transmitted to our AI processing pipeline with end-to-end encryption.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">🤖<span class="badge">3</span></div>
+        <h3>AI Analysis</h3>
+        <p>Deep learning models analyze visual patterns, color anomalies, and lesion characteristics in your image.</p>
+      </div>
+      <div class="step reveal">
+        <div class="step-num">🌾<span class="badge">4</span></div>
+        <h3>Results</h3>
+        <p>Get instant disease identification, confidence score, and a customized treatment action plan.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TECH SECTION -->
+<section class="tech-section">
+  <div class="canvas-panel reveal">
+    <canvas id="techCanvas"></canvas>
+    <div class="tech-label">🧠 Neural Network Visualization</div>
+  </div>
+  <div class="tech-info reveal">
+    <div class="section-tag">— AI Architecture</div>
+    <h2 class="section-title" style="font-size:2.2rem;margin-bottom:16px;">Built on <span>Deep Learning</span> Technology</h2>
+    <p style="color:var(--text-secondary);line-height:1.8;margin-bottom:24px;">CropAI leverages state-of-the-art convolutional neural networks and transfer learning from pre-trained vision models. Our system continuously improves through federated learning from anonymized farmer submissions.</p>
+    <div class="tech-stats">
+      <div class="t-stat"><div class="val">95.4%</div><div class="lbl">Top-1 Accuracy</div></div>
+      <div class="t-stat"><div class="val">20+</div><div class="lbl">Disease Classes</div></div>
+      <div class="t-stat"><div class="val">&lt;3s</div><div class="lbl">Inference Time</div></div>
+      <div class="t-stat"><div class="val">50K+</div><div class="lbl">Training Images</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- BENEFITS -->
+<section class="benefits">
+  <div class="benefits-inner">
+    <div class="section-header reveal">
+      <div class="section-tag">— Why CropAI</div>
+      <h2 class="section-title">Real Results for <span>Real Farmers</span></h2>
+    </div>
+    <div class="benefits-grid">
+      <div class="benefit-item reveal">
+        <div class="benefit-icon">📉</div>
+        <div class="benefit-text">
+          <h4>Reduce Crop Losses</h4>
+          <p>Early detection prevents disease spread, reducing potential crop losses by up to 40% before harvest.</p>
+        </div>
+      </div>
+      <div class="benefit-item reveal">
+        <div class="benefit-icon">⏱️</div>
+        <div class="benefit-text">
+          <h4>Save Valuable Time</h4>
+          <p>No more waiting for agricultural experts. Get instant AI analysis anytime, anywhere in the field.</p>
+        </div>
+      </div>
+      <div class="benefit-item reveal">
+        <div class="benefit-icon">💰</div>
+        <div class="benefit-text">
+          <h4>Cut Treatment Costs</h4>
+          <p>Targeted treatment recommendations prevent over-application of pesticides, saving money and the environment.</p>
+        </div>
+      </div>
+      <div class="benefit-item reveal">
+        <div class="benefit-icon">📱</div>
+        <div class="benefit-text">
+          <h4>Works on Any Device</h4>
+          <p>Fully responsive — works on smartphones, tablets, and desktops with no app installation required.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">🌱 CropAI</div>
+  <p style="color:var(--text-secondary);margin-bottom:16px;">AI-Powered Smart Farming Solution</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="features.html">Features</a></li>
+    <li><a href="aicrop.html">AI Detection</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <p class="footer-copy">© 2026 CropAI. All Rights Reserved.</p>
+</footer>
+
+<script>
+// BG Canvas (page hero dots)
+(function() {
+  const c = document.getElementById('bgCanvas'), ctx = c.getContext('2d');
+  let W, H, pts = [];
+  function resize() { W = c.width = c.offsetWidth; H = c.height = c.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
+  class Pt { constructor() { this.x=Math.random()*W; this.y=Math.random()*H; this.vx=(Math.random()-.5)*.3; this.vy=(Math.random()-.5)*.3; this.r=Math.random()*1.5+.5; } update() { this.x+=this.vx; this.y+=this.vy; if(this.x<0||this.x>W)this.vx*=-1; if(this.y<0||this.y>H)this.vy*=-1; } draw() { ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='rgba(74,222,128,0.25)';ctx.fill(); } }
+  pts = Array.from({length:60},()=>new Pt());
+  function loop() { ctx.clearRect(0,0,W,H); pts.forEach(p=>{ p.update();p.draw(); }); requestAnimationFrame(loop); }
+  loop();
+})();
+
+// Tech Canvas (neural network)
+(function() {
+  const c = document.getElementById('techCanvas'), ctx = c.getContext('2d');
+  let W, H, t = 0;
+  function resize() { W = c.width = c.offsetWidth; H = c.height = c.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
+
+  const layers = [3, 5, 6, 5, 3];
+  function loop() {
+    ctx.clearRect(0, 0, W, H); t += 0.02;
+    const layerX = layers.map((_, i) => (W / (layers.length + 1)) * (i + 1));
+    const nodes = layers.map((count, li) => {
+      return Array.from({length: count}, (_, ni) => ({
+        x: layerX[li],
+        y: (H / (count + 1)) * (ni + 1)
+      }));
+    });
+
+    // Draw connections
+    for (let li = 0; li < layers.length - 1; li++) {
+      nodes[li].forEach((n1, ni1) => {
+        nodes[li+1].forEach((n2, ni2) => {
+          const wave = Math.sin(t + ni1 * 0.5 + ni2 * 0.3 + li * 0.8);
+          const alpha = 0.04 + 0.06 * (wave + 1) / 2;
+          ctx.beginPath(); ctx.moveTo(n1.x, n1.y); ctx.lineTo(n2.x, n2.y);
+          ctx.strokeStyle = `rgba(74,222,128,${alpha})`; ctx.lineWidth = 1; ctx.stroke();
+        });
+      });
+    }
+
+    // Draw nodes
+    nodes.forEach((layer, li) => {
+      layer.forEach((n, ni) => {
+        const pulse = Math.sin(t * 1.5 + li * 0.7 + ni * 0.4);
+        const r = 7 + pulse * 2;
+        const alpha = 0.5 + 0.5 * (pulse + 1) / 2;
+
+        ctx.beginPath(); ctx.arc(n.x, n.y, r + 4, 0, Math.PI*2);
+        ctx.fillStyle = `rgba(34,197,94,0.08)`; ctx.fill();
+
+        ctx.beginPath(); ctx.arc(n.x, n.y, r, 0, Math.PI*2);
+        const grad = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r);
+        grad.addColorStop(0, `rgba(163,230,53,${alpha})`);
+        grad.addColorStop(1, `rgba(34,197,94,${alpha * 0.3})`);
+        ctx.fillStyle = grad; ctx.fill();
+      });
+    });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// Scroll Reveal
+const obs = new IntersectionObserver(es => es.forEach(e => { if(e.isIntersecting) e.target.classList.add('visible'); }), { threshold: 0.1 });
+document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Contact – CropAI Support & Feedback</title>
+  <meta name="description" content="Get in touch with the CropAI team for support, feedback, or partnership inquiries. We'd love to hear from you.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --green-800:#14532d;--green-700:#15803d;--green-600:#16a34a;
+      --green-500:#22c55e;--green-400:#4ade80;--green-300:#86efac;--accent:#a3e635;
+      --bg-dark:#060f0a;--bg-card:rgba(255,255,255,0.04);
+      --border:rgba(255,255,255,0.08);--text-primary:#f0fdf4;--text-secondary:#a1a1aa;
+    }
+    html{scroll-behavior:smooth;}
+    body{font-family:'Inter',sans-serif;background:var(--bg-dark);color:var(--text-primary);overflow-x:hidden;}
+
+    /* NAV */
+    nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;justify-content:space-between;align-items:center;padding:18px 60px;background:rgba(6,15,10,0.85);backdrop-filter:blur(24px);border-bottom:1px solid var(--border);}
+    .nav-logo{font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,var(--green-400),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .nav-links{display:flex;gap:36px;list-style:none;}
+    .nav-links a{color:var(--text-secondary);text-decoration:none;font-size:.95rem;font-weight:500;transition:color .2s;}
+    .nav-links a:hover,.nav-links a.active{color:var(--green-400);}
+    .nav-cta{background:linear-gradient(135deg,var(--green-600),var(--green-500));color:white!important;padding:10px 24px;border-radius:50px;font-weight:600!important;}
+
+    /* PAGE HERO */
+    .page-hero{
+      padding:140px 60px 80px;text-align:center;position:relative;overflow:hidden;
+      background:radial-gradient(ellipse at 50% 0%,rgba(20,83,45,0.45),transparent 60%);
+    }
+    #bgCanvas{position:absolute;inset:0;width:100%;height:100%;z-index:0;}
+    .page-hero > *{position:relative;z-index:1;}
+    .page-tag{display:inline-flex;align-items:center;gap:8px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.3);color:var(--green-400);padding:8px 18px;border-radius:50px;font-size:.8rem;font-weight:600;letter-spacing:1px;text-transform:uppercase;margin-bottom:20px;}
+    .page-hero h1{font-size:clamp(2.2rem,5vw,3.8rem);font-weight:900;letter-spacing:-2px;margin-bottom:14px;}
+    .page-hero h1 span{background:linear-gradient(135deg,var(--green-400),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .page-hero p{color:var(--text-secondary);font-size:1.05rem;max-width:500px;margin:0 auto;}
+
+    /* CONTACT SECTION */
+    .contact-section{padding:80px 60px 120px;max-width:1200px;margin:0 auto;}
+    .contact-grid{display:grid;grid-template-columns:1fr 1.5fr;gap:48px;align-items:start;}
+
+    /* INFO PANEL */
+    .info-panel{display:flex;flex-direction:column;gap:24px;}
+    .info-card{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:28px;transition:all .3s;}
+    .info-card:hover{border-color:rgba(34,197,94,.3);transform:translateX(6px);}
+    .info-icon{width:44px;height:44px;border-radius:12px;background:rgba(34,197,94,0.1);border:1px solid rgba(34,197,94,0.2);display:flex;align-items:center;justify-content:center;font-size:1.2rem;margin-bottom:14px;}
+    .info-card h3{font-size:1rem;font-weight:700;margin-bottom:6px;}
+    .info-card p{font-size:.9rem;color:var(--text-secondary);}
+    .info-card a{color:var(--green-400);text-decoration:none;}
+    .info-card a:hover{text-decoration:underline;}
+
+    .social-bar{background:var(--bg-card);border:1px solid var(--border);border-radius:20px;padding:24px;}
+    .social-bar h3{font-size:.9rem;font-weight:700;margin-bottom:16px;color:var(--text-secondary);text-transform:uppercase;letter-spacing:1px;}
+    .social-icons{display:flex;gap:12px;}
+    .soc-btn{width:44px;height:44px;border-radius:12px;background:rgba(255,255,255,0.05);border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:1.2rem;cursor:pointer;transition:all .3s;text-decoration:none;}
+    .soc-btn:hover{background:rgba(34,197,94,0.15);border-color:rgba(34,197,94,.3);transform:translateY(-3px);}
+
+    .canvas-card{border-radius:20px;overflow:hidden;border:1px solid var(--border);height:160px;position:relative;}
+    #miniCanvas{width:100%;height:100%;}
+    .canvas-label{position:absolute;bottom:14px;left:14px;font-size:.75rem;font-weight:600;color:var(--green-400);background:rgba(6,15,10,0.8);padding:4px 12px;border-radius:50px;border:1px solid rgba(34,197,94,0.2);}
+
+    /* FORM */
+    .form-panel{background:var(--bg-card);border:1px solid var(--border);border-radius:24px;padding:48px;}
+    .form-header{margin-bottom:36px;}
+    .form-header h2{font-size:1.6rem;font-weight:800;letter-spacing:-.5px;}
+    .form-header p{color:var(--text-secondary);font-size:.9rem;margin-top:6px;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;}
+    .field{display:flex;flex-direction:column;gap:8px;margin-bottom:20px;}
+    .field label{font-size:.85rem;font-weight:600;color:var(--text-secondary);text-transform:uppercase;letter-spacing:.8px;}
+    .field input,.field textarea,.field select{
+      background:rgba(255,255,255,0.04);border:1px solid var(--border);
+      border-radius:12px;padding:14px 18px;color:var(--text-primary);
+      font-family:'Inter',sans-serif;font-size:.95rem;outline:none;
+      transition:all .3s;resize:none;
+    }
+    .field input:focus,.field textarea:focus,.field select:focus{border-color:rgba(34,197,94,0.5);background:rgba(34,197,94,0.04);box-shadow:0 0 0 3px rgba(34,197,94,0.08);}
+    .field input::placeholder,.field textarea::placeholder{color:#52525b;}
+    .field select option{background:#0f1f14;color:var(--text-primary);}
+    .char-count{font-size:.75rem;color:var(--text-secondary);text-align:right;margin-top:4px;}
+    .submit-btn{
+      width:100%;padding:18px;border:none;border-radius:14px;
+      background:linear-gradient(135deg,var(--green-700),var(--green-500));
+      color:white;font-family:'Inter',sans-serif;font-size:1.05rem;font-weight:700;
+      cursor:pointer;transition:all .3s;position:relative;overflow:hidden;
+    }
+    .submit-btn:hover{transform:translateY(-2px);box-shadow:0 16px 40px rgba(34,197,94,.35);}
+    .submit-btn:active{transform:translateY(0);}
+    .field-error{color:#f87171;font-size:.8rem;display:none;}
+    .field.invalid input,.field.invalid textarea{border-color:#f87171;}
+    .field.invalid .field-error{display:block;}
+
+    /* SUCCESS MESSAGE */
+    .success-msg{display:none;text-align:center;padding:40px;}
+    .success-msg.show{display:block;}
+    .success-circle{width:80px;height:80px;border-radius:50%;background:rgba(34,197,94,0.15);border:2px solid rgba(34,197,94,.4);display:flex;align-items:center;justify-content:center;font-size:2.2rem;margin:0 auto 20px;animation:scaleIn .5s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes scaleIn{from{transform:scale(0);opacity:0;}to{transform:scale(1);opacity:1;}}
+    .success-msg h3{font-size:1.4rem;font-weight:800;margin-bottom:8px;}
+    .success-msg p{color:var(--text-secondary);font-size:.95rem;}
+    .btn-reset{margin-top:24px;display:inline-flex;align-items:center;gap:8px;background:var(--bg-card);border:1px solid var(--border);color:var(--text-secondary);padding:12px 24px;border-radius:50px;cursor:pointer;font-family:'Inter',sans-serif;font-size:.9rem;font-weight:600;transition:all .3s;}
+    .btn-reset:hover{border-color:var(--green-400);color:var(--green-400);}
+
+    /* MAP */
+    .map-section{padding:0 60px 100px;max-width:1200px;margin:0 auto;}
+    .map-header{text-align:center;margin-bottom:32px;}
+    .map-header h2{font-size:2rem;font-weight:800;letter-spacing:-.5px;}
+    .map-header h2 span{background:linear-gradient(135deg,var(--green-400),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .map-wrap{border-radius:24px;overflow:hidden;border:1px solid var(--border);position:relative;}
+    .map-wrap iframe{display:block;width:100%;height:380px;filter:grayscale(1) invert(0.9) hue-rotate(100deg) brightness(0.8);}
+    .map-overlay{position:absolute;top:16px;left:16px;background:rgba(6,15,10,0.9);border:1px solid rgba(34,197,94,.3);border-radius:12px;padding:12px 18px;}
+    .map-overlay h4{font-size:.9rem;font-weight:700;color:var(--green-400);}
+    .map-overlay p{font-size:.8rem;color:var(--text-secondary);margin-top:2px;}
+
+    /* FOOTER */
+    footer{background:rgba(0,0,0,0.4);border-top:1px solid var(--border);padding:60px;text-align:center;}
+    .footer-logo{font-size:1.8rem;font-weight:800;margin-bottom:12px;background:linear-gradient(135deg,var(--green-400),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .footer-links{display:flex;justify-content:center;gap:32px;margin:16px 0 24px;list-style:none;}
+    .footer-links a{color:var(--text-secondary);text-decoration:none;font-size:.9rem;transition:color .2s;}
+    .footer-links a:hover{color:var(--green-400);}
+    .footer-copy{font-size:.85rem;color:#52525b;}
+
+    .reveal{opacity:0;transform:translateY(36px);transition:all .7s cubic-bezier(.16,1,.3,1);}
+    .reveal.visible{opacity:1;transform:none;}
+
+    @media(max-width:900px){
+      nav{padding:16px 24px;} .nav-links{display:none;}
+      .page-hero{padding:120px 24px 60px;}
+      .contact-section,.map-section{padding:60px 24px;}
+      .contact-grid{grid-template-columns:1fr;}
+      .form-row{grid-template-columns:1fr;}
+      .form-panel{padding:28px 20px;}
+      footer{padding:40px 24px;}
+    }
+  </style>
+</head>
+<body>
+<nav>
+  <div class="nav-logo">🌱 CropAI</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="features.html">Features</a></li>
+    <li><a href="aicrop.html">AI Detection</a></li>
+    <li><a href="contact.html" class="active">Contact</a></li>
+    <li><a href="aicrop.html" class="nav-cta">Try for Free →</a></li>
+  </ul>
+</nav>
+
+<section class="page-hero">
+  <canvas id="bgCanvas"></canvas>
+  <div class="page-tag">📞 Get in Touch</div>
+  <h1>Contact <span>CropAI</span></h1>
+  <p>Have feedback, questions, or partnership ideas? We'd love to hear from you.</p>
+</section>
+
+<section class="contact-section">
+  <div class="contact-grid">
+    <!-- INFO SIDE -->
+    <div class="info-panel reveal">
+      <div class="info-card">
+        <div class="info-icon">📧</div>
+        <h3>Email Us</h3>
+        <p><a href="mailto:cropai@gmail.com">cropai@gmail.com</a></p>
+        <p style="font-size:.8rem;color:#71717a;margin-top:4px;">We reply within 24 hours</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">📱</div>
+        <h3>Call Us</h3>
+        <p><a href="tel:+919876543210">+91 9876543210</a></p>
+        <p style="font-size:.8rem;color:#71717a;margin-top:4px;">Mon–Sat, 9AM–6PM IST</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">📍</div>
+        <h3>Our Office</h3>
+        <p>Electronic City, Bangalore<br>Karnataka – 560100, India</p>
+      </div>
+      <div class="info-card">
+        <div class="info-icon">🌐</div>
+        <h3>Website</h3>
+        <p><a href="#">www.cropai.com</a></p>
+      </div>
+      <div class="social-bar">
+        <h3>Follow Us</h3>
+        <div class="social-icons">
+          <a class="soc-btn" href="#" title="Twitter">🐦</a>
+          <a class="soc-btn" href="#" title="LinkedIn">💼</a>
+          <a class="soc-btn" href="#" title="Instagram">📸</a>
+          <a class="soc-btn" href="#" title="Facebook">📘</a>
+          <a class="soc-btn" href="#" title="GitHub">🐙</a>
+        </div>
+      </div>
+      <div class="canvas-card">
+        <canvas id="miniCanvas"></canvas>
+        <div class="canvas-label">🌱 Growing with AI</div>
+      </div>
+    </div>
+
+    <!-- FORM SIDE -->
+    <div class="form-panel reveal">
+      <div id="formContent">
+        <div class="form-header">
+          <h2>Send us a Message</h2>
+          <p>Fill in the form below and our team will get back to you shortly.</p>
+        </div>
+        <form id="contactForm" onsubmit="return handleSubmit(event)">
+          <div class="form-row">
+            <div class="field" id="nameField">
+              <label for="name">Your Name</label>
+              <input type="text" id="name" placeholder="Rohan Sharma">
+              <span class="field-error">Please enter your name</span>
+            </div>
+            <div class="field" id="emailField">
+              <label for="email">Email Address</label>
+              <input type="email" id="email" placeholder="rohan@example.com">
+              <span class="field-error">Please enter a valid email</span>
+            </div>
+          </div>
+          <div class="field">
+            <label for="subject">Subject</label>
+            <select id="subject">
+              <option value="">Select a topic…</option>
+              <option value="support">Technical Support</option>
+              <option value="feedback">Feedback & Suggestions</option>
+              <option value="partnership">Partnership Inquiry</option>
+              <option value="media">Media & Press</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
+          <div class="field" id="msgField">
+            <label for="message">Your Message</label>
+            <textarea id="message" rows="6" placeholder="Tell us how we can help you..." oninput="updateCount()"></textarea>
+            <div class="char-count"><span id="charCount">0</span> / 500 characters</div>
+            <span class="field-error">Please enter your message</span>
+          </div>
+          <button type="submit" class="submit-btn" id="submitBtn">✉️ Send Message</button>
+        </form>
+      </div>
+      <div class="success-msg" id="successMsg">
+        <div class="success-circle">✅</div>
+        <h3>Message Sent!</h3>
+        <p>Thank you for reaching out. Our team will respond within 24 hours.</p>
+        <button class="btn-reset" onclick="resetForm()">← Send Another Message</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MAP -->
+<section class="map-section">
+  <div class="map-header reveal">
+    <h2>Find Us on the <span>Map</span></h2>
+  </div>
+  <div class="map-wrap reveal">
+    <iframe
+      src="https://maps.google.com/maps?q=Electronic+City+Bangalore&t=&z=13&ie=UTF8&iwloc=&output=embed"
+      allowfullscreen loading="lazy"
+      referrerpolicy="no-referrer-when-downgrade">
+    </iframe>
+    <div class="map-overlay">
+      <h4>📍 CropAI HQ</h4>
+      <p>Electronic City, Bangalore</p>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">🌱 CropAI</div>
+  <p style="color:var(--text-secondary);margin-bottom:4px;">AI-Powered Smart Farming Solution</p>
+  <ul class="footer-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="features.html">Features</a></li>
+    <li><a href="aicrop.html">AI Detection</a></li>
+    <li><a href="contact.html">Contact</a></li>
+  </ul>
+  <p class="footer-copy">© 2026 CropAI. All Rights Reserved.</p>
+</footer>
+
+<script>
+// BG Canvas
+(function(){
+  const c=document.getElementById('bgCanvas'),ctx=c.getContext('2d');
+  let W,H,pts=[];
+  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+  class Pt{constructor(){this.x=Math.random()*W;this.y=Math.random()*H;this.vx=(Math.random()-.5)*.3;this.vy=(Math.random()-.5)*.3;this.r=Math.random()*1.5+.5;}update(){this.x+=this.vx;this.y+=this.vy;if(this.x<0||this.x>W)this.vx*=-1;if(this.y<0||this.y>H)this.vy*=-1;}draw(){ctx.beginPath();ctx.arc(this.x,this.y,this.r,0,Math.PI*2);ctx.fillStyle='rgba(74,222,128,0.2)';ctx.fill();}}
+  pts=Array.from({length:50},()=>new Pt());
+  function loop(){ctx.clearRect(0,0,W,H);pts.forEach(p=>{p.update();p.draw();});requestAnimationFrame(loop);}
+  loop();
+})();
+
+// Mini Canvas (wave animation)
+(function(){
+  const c=document.getElementById('miniCanvas'),ctx=c.getContext('2d');
+  let W,H,t=0;
+  function resize(){W=c.width=c.offsetWidth;H=c.height=c.offsetHeight;}
+  resize();window.addEventListener('resize',resize);
+  function loop(){
+    ctx.clearRect(0,0,W,H);t+=0.04;
+    for(let layer=0;layer<3;layer++){
+      const amp=12-layer*3,freq=layer*.5+.5,phase=layer*1.2;
+      ctx.beginPath();
+      for(let x=0;x<=W;x+=3){
+        const y=H/2+Math.sin(x*freq*.02+t+phase)*amp;
+        x===0?ctx.moveTo(x,y):ctx.lineTo(x,y);
+      }
+      ctx.strokeStyle=`rgba(74,222,128,${0.4-layer*.1})`;ctx.lineWidth=2-layer*.3;ctx.stroke();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
+
+// Character counter
+function updateCount(){
+  const msg=document.getElementById('message').value;
+  document.getElementById('charCount').textContent=msg.length;
+}
+
+// Form validation & submit
+function handleSubmit(e){
+  e.preventDefault();
+  let valid=true;
+  const name=document.getElementById('name').value.trim();
+  const email=document.getElementById('email').value.trim();
+  const msg=document.getElementById('message').value.trim();
+
+  document.getElementById('nameField').classList.toggle('invalid',!name);
+  document.getElementById('emailField').classList.toggle('invalid',!email||!email.includes('@'));
+  document.getElementById('msgField').classList.toggle('invalid',!msg);
+
+  if(!name||!email||!email.includes('@')||!msg){return false;}
+
+  const btn=document.getElementById('submitBtn');
+  btn.textContent='⏳ Sending...';btn.disabled=true;
+
+  setTimeout(()=>{
+    document.getElementById('formContent').style.display='none';
+    document.getElementById('successMsg').classList.add('show');
+  },1500);
+  return false;
+}
+
+function resetForm(){
+  document.getElementById('contactForm').reset();
+  document.getElementById('charCount').textContent='0';
+  document.getElementById('formContent').style.display='block';
+  document.getElementById('successMsg').classList.remove('show');
+  document.getElementById('submitBtn').textContent='✉️ Send Message';
+  document.getElementById('submitBtn').disabled=false;
+  ['nameField','emailField','msgField'].forEach(id=>document.getElementById(id).classList.remove('invalid'));
+}
+
+// Scroll reveal
+const obs=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible');}),{threshold:.1});
+document.querySelectorAll('.reveal').forEach(el=>obs.observe(el));
+</script>
+</body>
+</html>

@@ -1,313 +1,691 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Crop Disease Detector</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CropAI – AI Crop Disease Detector</title>
+  <meta name="description" content="CropAI uses cutting-edge Artificial Intelligence to detect crop diseases instantly. Upload an image and protect your harvest before it's too late.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
+    :root {
+      --green-900: #052e16;
+      --green-800: #14532d;
+      --green-700: #15803d;
+      --green-600: #16a34a;
+      --green-500: #22c55e;
+      --green-400: #4ade80;
+      --green-300: #86efac;
+      --accent: #a3e635;
+      --gold: #fbbf24;
+      --bg-dark: #060f0a;
+      --bg-card: rgba(255,255,255,0.04);
+      --border: rgba(255,255,255,0.08);
+      --text-primary: #f0fdf4;
+      --text-secondary: #a1a1aa;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      overflow-x: hidden;
+    }
+
+    /* ── CANVAS ── */
+    #heroCanvas {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+    }
+
+    /* ── NAVBAR ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 18px 60px;
+      background: rgba(6, 15, 10, 0.75);
+      backdrop-filter: blur(24px);
+      border-bottom: 1px solid var(--border);
+      transition: all 0.3s ease;
+    }
+    nav.scrolled {
+      background: rgba(6,15,10,0.95);
+      padding: 12px 60px;
+    }
+    .nav-logo {
+      font-size: 1.6rem; font-weight: 800;
+      background: linear-gradient(135deg, var(--green-400), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -0.5px;
+    }
+    .nav-links { display: flex; gap: 36px; list-style: none; }
+    .nav-links a {
+      color: var(--text-secondary); text-decoration: none;
+      font-size: 0.95rem; font-weight: 500;
+      transition: color 0.2s; position: relative;
+    }
+    .nav-links a::after {
+      content: ''; position: absolute; bottom: -4px; left: 0;
+      width: 0; height: 2px;
+      background: var(--green-400);
+      transition: width 0.3s;
+    }
+    .nav-links a:hover { color: var(--green-300); }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      background: linear-gradient(135deg, var(--green-600), var(--green-500));
+      color: white !important; padding: 10px 24px;
+      border-radius: 50px; font-weight: 600 !important;
+    }
+    .nav-cta::after { display: none !important; }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(34,197,94,0.4); }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative; min-height: 100vh;
+      display: flex; align-items: center;
+      overflow: hidden;
+      background: radial-gradient(ellipse at 30% 50%, rgba(20,83,45,0.4) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(34,197,94,0.12) 0%, transparent 50%),
+                  var(--bg-dark);
+    }
+    .hero-content {
+      position: relative; z-index: 2;
+      max-width: 1200px; margin: 0 auto; padding: 120px 60px 80px;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 8px;
+      background: rgba(34,197,94,0.1); border: 1px solid rgba(34,197,94,0.3);
+      color: var(--green-400); padding: 8px 18px; border-radius: 50px;
+      font-size: 0.8rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
+      margin-bottom: 24px;
+    }
+    .hero-badge .dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--green-400);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.3); }
+    }
+    .hero h1 {
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 900; line-height: 1.05;
+      letter-spacing: -2px; margin-bottom: 24px;
+    }
+    .hero h1 span {
+      background: linear-gradient(135deg, var(--green-400) 0%, var(--accent) 50%, var(--green-300) 100%);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .hero p {
+      font-size: 1.15rem; color: var(--text-secondary);
+      line-height: 1.7; margin-bottom: 40px; max-width: 480px;
+    }
+    .hero-btns { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: linear-gradient(135deg, var(--green-600), var(--green-500));
+      color: white; text-decoration: none; padding: 16px 32px;
+      border-radius: 50px; font-weight: 700; font-size: 1rem;
+      box-shadow: 0 8px 32px rgba(34,197,94,0.35);
+      transition: all 0.3s;
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 16px 40px rgba(34,197,94,0.5); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--bg-card); border: 1px solid var(--border);
+      color: var(--text-primary); text-decoration: none;
+      padding: 16px 32px; border-radius: 50px; font-weight: 600;
+      backdrop-filter: blur(12px); transition: all 0.3s;
+    }
+    .btn-secondary:hover { border-color: var(--green-500); color: var(--green-400); transform: translateY(-3px); }
+
+    .hero-visual {
+      position: relative; display: flex; justify-content: center; align-items: center;
+    }
+    .hero-img-wrap {
+      position: relative; width: 480px; height: 380px;
+    }
+    .hero-img-wrap img {
+      width: 100%; height: 100%; object-fit: cover;
+      border-radius: 28px;
+      border: 1px solid rgba(34,197,94,0.2);
+      box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 0 1px rgba(34,197,94,0.1);
+    }
+    .float-card {
+      position: absolute;
+      background: rgba(6,15,10,0.85); backdrop-filter: blur(20px);
+      border: 1px solid rgba(34,197,94,0.3); border-radius: 16px;
+      padding: 14px 20px; white-space: nowrap;
+    }
+    .float-card-1 { top: -20px; left: -30px; animation: floatY 4s ease-in-out infinite; }
+    .float-card-2 { bottom: 20px; right: -30px; animation: floatY 4s ease-in-out infinite 2s; }
+    .float-card .label { font-size: 0.7rem; color: var(--text-secondary); margin-bottom: 4px; }
+    .float-card .value { font-size: 1.1rem; font-weight: 700; color: var(--green-400); }
+    @keyframes floatY {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-12px); }
+    }
+
+    /* ── STATS ── */
+    .stats {
+      padding: 80px 60px;
+      background: rgba(255,255,255,0.02);
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+    }
+    .stats-grid {
+      max-width: 1100px; margin: 0 auto;
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 40px;
+    }
+    .stat-item { text-align: center; }
+    .stat-num {
+      font-size: 3.2rem; font-weight: 900;
+      background: linear-gradient(135deg, var(--green-400), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      letter-spacing: -1px;
+    }
+    .stat-label { font-size: 0.95rem; color: var(--text-secondary); margin-top: 6px; font-weight: 500; }
+
+    /* ── ABOUT ── */
+    .about {
+      padding: 120px 60px;
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center;
+    }
+    .section-tag {
+      display: inline-block;
+      color: var(--green-400); font-size: 0.8rem;
+      font-weight: 700; letter-spacing: 2px; text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-title {
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      font-weight: 800; line-height: 1.15; letter-spacing: -1px;
+      margin-bottom: 24px;
+    }
+    .section-title span {
+      background: linear-gradient(135deg, var(--green-400), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .section-desc { color: var(--text-secondary); line-height: 1.8; font-size: 1.05rem; margin-bottom: 32px; }
+    .check-list { list-style: none; display: flex; flex-direction: column; gap: 14px; }
+    .check-list li {
+      display: flex; align-items: center; gap: 12px;
+      color: var(--text-secondary); font-size: 0.95rem;
+    }
+    .check-list li span {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; flex-shrink: 0;
+    }
+    .canvas-box {
+      position: relative; height: 360px; border-radius: 24px; overflow: hidden;
+      border: 1px solid var(--border);
+      background: radial-gradient(ellipse at center, rgba(20,83,45,0.3), transparent);
+    }
+    #aboutCanvas { width: 100%; height: 100%; }
+
+    /* ── FEATURES PREVIEW ── */
+    .features-preview {
+      padding: 80px 60px 120px;
+      background: linear-gradient(180deg, transparent, rgba(20,83,45,0.08));
+    }
+    .features-preview .container { max-width: 1200px; margin: 0 auto; }
+    .section-header { text-align: center; margin-bottom: 64px; }
+    .cards-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+    .feature-card {
+      background: var(--bg-card); border: 1px solid var(--border);
+      border-radius: 20px; padding: 32px;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      cursor: default; position: relative; overflow: hidden;
+    }
+    .feature-card::before {
+      content: ''; position: absolute; inset: 0;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(34,197,94,0.08), transparent 60%);
+      opacity: 0; transition: opacity 0.3s;
+    }
+    .feature-card:hover::before { opacity: 1; }
+    .feature-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(34,197,94,0.4);
+      box-shadow: 0 24px 60px rgba(0,0,0,0.4), 0 0 0 1px rgba(34,197,94,0.1);
+    }
+    .feat-icon {
+      width: 56px; height: 56px; border-radius: 14px;
+      background: linear-gradient(135deg, rgba(34,197,94,0.2), rgba(34,197,94,0.05));
+      border: 1px solid rgba(34,197,94,0.3);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; margin-bottom: 20px;
+    }
+    .feat-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 12px; }
+    .feat-desc { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      margin: 0 60px 120px;
+      border-radius: 32px;
+      overflow: hidden; position: relative;
+      background: linear-gradient(135deg, var(--green-900), var(--green-800));
+      border: 1px solid rgba(34,197,94,0.2);
+    }
+    #ctaCanvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .cta-content {
+      position: relative; z-index: 2;
+      padding: 80px; text-align: center;
+    }
+    .cta-content h2 { font-size: 2.8rem; font-weight: 800; letter-spacing: -1px; margin-bottom: 16px; }
+    .cta-content p { color: var(--green-300); font-size: 1.1rem; margin-bottom: 40px; }
+
+    /* ── FOOTER ── */
+    footer {
+      background: rgba(0,0,0,0.4);
+      border-top: 1px solid var(--border);
+      padding: 60px; text-align: center;
+    }
+    .footer-logo {
+      font-size: 1.8rem; font-weight: 800; margin-bottom: 12px;
+      background: linear-gradient(135deg, var(--green-400), var(--accent));
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .footer-desc { color: var(--text-secondary); margin-bottom: 24px; }
+    .footer-links { display: flex; justify-content: center; gap: 32px; margin-bottom: 32px; }
+    .footer-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+    .footer-links a:hover { color: var(--green-400); }
+    .footer-copy { font-size: 0.85rem; color: #52525b; }
+
+    /* ── REVEAL ANIMATION ── */
+    .reveal { opacity: 0; transform: translateY(40px); transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1); }
+    .reveal.visible { opacity: 1; transform: translateY(0); }
+
+    @media (max-width: 900px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hero-content { grid-template-columns: 1fr; padding: 120px 24px 60px; }
+      .hero-visual { display: none; }
+      .about { grid-template-columns: 1fr; padding: 60px 24px; }
+      .stats { padding: 60px 24px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+      .cards-grid { grid-template-columns: 1fr; }
+      .cta-section { margin: 0 24px 80px; }
+      .cta-content { padding: 50px 32px; }
+      .features-preview { padding: 60px 24px; }
+    }
+  </style>
 </head>
+<body>
 
-<body class="bg-gray-50">
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-logo">🌱 CropAI</div>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="features.html">Features</a></li>
+    <li><a href="aicrop.html">AI Detection</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="aicrop.html" class="nav-cta">Try for Free →</a></li>
+  </ul>
+</nav>
 
-    <!-- Navbar -->
-    <nav class="bg-green-700 text-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-
-            <h1 class="text-2xl font-bold">
-                🌱 CropAI
-            </h1>
-
-            <ul class="hidden md:flex gap-8 font-medium">
-                <li><a href="#home" class="hover:text-green-200">Home</a></li>
-                <li><a href="#features" class="hover:text-green-200">Features</a></li>
-                <li><a href="#works" class="hover:text-green-200">How It Works</a></li>
-                <li><a href="#benefits" class="hover:text-green-200">Benefits</a></li>
-                <li><a href="#contact" class="hover:text-green-200">Contact</a></li>
-            </ul>
-
-        </div>
-    </nav>
-
-    <!-- Hero Section -->
-    <section id="home" class="bg-gradient-to-r from-green-700 to-emerald-500 text-white min-h-screen flex items-center">
-
-        <div class="max-w-7xl mx-auto px-6 grid md:grid-cols-2 gap-10 items-center">
-
-            <div>
-                <h1 class="text-5xl md:text-6xl font-bold leading-tight">
-                    AI Crop Disease Detector
-                </h1>
-
-                <p class="mt-6 text-xl">
-                    Detect crop diseases instantly using Artificial Intelligence.
-                    Upload crop images and receive accurate disease predictions
-                    with treatment recommendations.
-                </p>
-
-                <div class="mt-8 flex gap-4">
-                    <button class="bg-white text-green-700 px-6 py-3 rounded-lg font-semibold hover:scale-105 transition">
-                        Get Started
-                    </button>
-
-                    <button class="border border-white px-6 py-3 rounded-lg hover:bg-white hover:text-green-700 transition">
-                        Learn More
-                    </button>
-                </div>
-            </div>
-
-            <div class="group relative w-full overflow-hidden rounded-3xl shadow-2xl">
-
-    <div class="w-full overflow-hidden rounded-3xl shadow-2xl">
-
-    <video
-        autoplay
-        muted
-        loop
-        playsinline
-        class="w-full h-[400px] object-cover">
-        
-        <source src="crop-video.mp4.mp4" type="video/mp4">
-
-    </video>
-
-</div>
-
-</div>
-
-        </div>
-
-    </section>
-    <section class="py-20 bg-white">
-    <div class="max-w-4xl mx-auto text-center px-6">
-
-        <h2 class="text-4xl font-bold text-green-700 mb-4">
-            📷 Detect Crop Disease
-        </h2>
-
-        <p class="text-gray-600 mb-8">
-            Capture a crop image using your camera and upload it for AI analysis.
-        </p>
-
-        <div class="bg-green-50 p-10 rounded-2xl shadow-lg">
-
-            <input
-                type="file"
-                accept="image/*"
-                capture="environment"
-                class="block w-full text-sm text-gray-500
-                file:mr-4 file:py-3 file:px-6
-                file:rounded-lg file:border-0
-                file:bg-green-600 file:text-white
-                hover:file:bg-green-700">
-
-            <button
-                class="mt-6 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition">
-                Analyze Image
-            </button>
-
-        </div>
-
+<!-- HERO -->
+<section class="hero">
+  <canvas id="heroCanvas"></canvas>
+  <div class="hero-content">
+    <div>
+      <div class="hero-badge"><span class="dot"></span> AI-Powered Agriculture</div>
+      <h1>Protect Your Crops with <span>Smart AI</span> Detection</h1>
+      <p>Detect crop diseases instantly using cutting-edge Artificial Intelligence. Upload a photo and receive expert-level disease analysis with treatment recommendations in seconds.</p>
+      <div class="hero-btns">
+        <a href="aicrop.html" class="btn-primary">🔬 Start Analysis</a>
+        <a href="features.html" class="btn-secondary">Explore Features →</a>
+      </div>
     </div>
+    <div class="hero-visual">
+      <div class="hero-img-wrap">
+        <img src="https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=800&q=80" alt="Crop field">
+        <div class="float-card float-card-1">
+          <div class="label">AI ACCURACY</div>
+          <div class="value">95.4%</div>
+        </div>
+        <div class="float-card float-card-2">
+          <div class="label">DISEASES DETECTED</div>
+          <div class="value">20+ Types</div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-    <!-- Features -->
-    <section id="features" class="py-20 bg-white">
+<!-- STATS -->
+<section class="stats">
+  <div class="stats-grid">
+    <div class="stat-item reveal">
+      <div class="stat-num" data-target="95">0%</div>
+      <div class="stat-label">Detection Accuracy</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num" data-target="20">0+</div>
+      <div class="stat-label">Diseases Supported</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num" data-target="1000">0+</div>
+      <div class="stat-label">Images Analyzed</div>
+    </div>
+    <div class="stat-item reveal">
+      <div class="stat-num">24/7</div>
+      <div class="stat-label">AI Assistance</div>
+    </div>
+  </div>
+</section>
 
-        <div class="max-w-6xl mx-auto px-6">
+<!-- ABOUT -->
+<section style="padding: 120px 0;">
+  <div class="about">
+    <div class="reveal">
+      <div class="section-tag">— About CropAI</div>
+      <h2 class="section-title">Empowering Farmers with <span>Artificial Intelligence</span></h2>
+      <p class="section-desc">CropAI bridges the gap between advanced AI technology and everyday farming. Our platform helps farmers identify plant diseases early, reducing crop losses and increasing productivity with the power of machine learning.</p>
+      <ul class="check-list">
+        <li><span>✓</span> Upload any crop image for instant AI analysis</li>
+        <li><span>✓</span> Receive precise disease identification & confidence scores</li>
+        <li><span>✓</span> Get actionable treatment recommendations</li>
+        <li><span>✓</span> Works on mobile & desktop, 24/7</li>
+      </ul>
+    </div>
+    <div class="canvas-box reveal">
+      <canvas id="aboutCanvas"></canvas>
+    </div>
+  </div>
+</section>
 
-            <h2 class="text-4xl font-bold text-center text-gray-800">
-                Features
-            </h2>
+<!-- FEATURES PREVIEW -->
+<section class="features-preview">
+  <div class="container">
+    <div class="section-header reveal">
+      <div class="section-tag">— Key Features</div>
+      <h2 class="section-title" style="max-width:600px;margin:0 auto 16px;">Everything You Need for <span>Smart Farming</span></h2>
+      <p style="color:var(--text-secondary);font-size:1rem;">Powerful tools designed to make crop disease detection effortless.</p>
+    </div>
+    <div class="cards-grid">
+      <div class="feature-card reveal">
+        <div class="feat-icon">🤖</div>
+        <div class="feat-title">AI Detection Engine</div>
+        <div class="feat-desc">Powered by deep learning models trained on thousands of crop disease images for unmatched accuracy.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">📷</div>
+        <div class="feat-title">Camera & Upload</div>
+        <div class="feat-desc">Capture crop images live with your camera or upload from gallery. Results in under 3 seconds.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">📍</div>
+        <div class="feat-title">Geo-Tagged Reports</div>
+        <div class="feat-desc">Location-aware analysis to help understand regional disease patterns and seasonal outbreaks.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">⚡</div>
+        <div class="feat-title">Instant Results</div>
+        <div class="feat-desc">Get disease detection results with confidence scores and severity levels in real-time.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">💊</div>
+        <div class="feat-title">Treatment Guide</div>
+        <div class="feat-desc">Detailed treatment plans, pesticide recommendations, and organic alternatives for every disease.</div>
+      </div>
+      <div class="feature-card reveal">
+        <div class="feat-icon">📊</div>
+        <div class="feat-title">Analytics Dashboard</div>
+        <div class="feat-desc">Track your crop health history, disease trends, and analysis reports over time.</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-            <div class="grid md:grid-cols-3 gap-8 mt-12">
+<!-- CTA -->
+<div class="cta-section reveal">
+  <canvas id="ctaCanvas"></canvas>
+  <div class="cta-content">
+    <div class="hero-badge" style="justify-content:center;margin-bottom:20px;"><span class="dot"></span> Free to Use</div>
+    <h2>Start Protecting Your Crops Today</h2>
+    <p>AI-powered disease detection for smarter, more productive farming.</p>
+    <a href="aicrop.html" class="btn-primary" style="font-size:1.1rem;padding:18px 42px;">🔬 Analyze Your Crop Now</a>
+  </div>
+</div>
 
-                <div class="bg-green-50 p-8 rounded-2xl shadow-lg hover:scale-105 transition">
-                    <h3 class="text-2xl font-bold text-green-700">
-                        🤖 AI Detection
-                    </h3>
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">🌱 CropAI</div>
+  <p class="footer-desc">AI-Powered Crop Disease Detection Platform</p>
+  <div class="footer-links">
+    <a href="index.html">Home</a>
+    <a href="features.html">Features</a>
+    <a href="aicrop.html">AI Detection</a>
+    <a href="contact.html">Contact</a>
+  </div>
+  <p style="color:var(--text-secondary);font-size:0.85rem;margin-bottom:8px;">📧 cropai@gmail.com &nbsp;|&nbsp; 📱 +91 9876543210</p>
+  <p class="footer-copy">© 2026 CropAI. All Rights Reserved.</p>
+</footer>
 
-                    <p class="mt-4 text-gray-600">
-                        Detect diseases from crop images using advanced AI models.
-                    </p>
-                </div>
+<script>
+// ── NAVBAR SCROLL ──
+const navbar = document.getElementById('navbar');
+window.addEventListener('scroll', () => {
+  navbar.classList.toggle('scrolled', window.scrollY > 50);
+});
 
-                <div class="bg-green-50 p-8 rounded-2xl shadow-lg hover:scale-105 transition">
-                    <h3 class="text-2xl font-bold text-green-700">
-                        ⚡ Instant Results
-                    </h3>
+// ── HERO CANVAS (Particle Network) ──
+(function() {
+  const canvas = document.getElementById('heroCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, particles = [], mouse = { x: -999, y: -999 };
 
-                    <p class="mt-4 text-gray-600">
-                        Receive predictions within seconds after uploading images.
-                    </p>
-                </div>
+  function resize() {
+    W = canvas.width = canvas.offsetWidth;
+    H = canvas.height = canvas.offsetHeight;
+  }
 
-                <div class="bg-green-50 p-8 rounded-2xl shadow-lg hover:scale-105 transition">
-                    <h3 class="text-2xl font-bold text-green-700">
-                        💡 Treatment Guide
-                    </h3>
+  class Particle {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * W;
+      this.y = Math.random() * H;
+      this.vx = (Math.random() - 0.5) * 0.4;
+      this.vy = (Math.random() - 0.5) * 0.4;
+      this.r = Math.random() * 2 + 1;
+      this.alpha = Math.random() * 0.5 + 0.1;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      if (this.x < 0 || this.x > W) this.vx *= -1;
+      if (this.y < 0 || this.y > H) this.vy *= -1;
 
-                    <p class="mt-4 text-gray-600">
-                        Get recommendations and preventive measures for diseases.
-                    </p>
-                </div>
+      // mouse repel
+      const dx = this.x - mouse.x, dy = this.y - mouse.y;
+      const dist = Math.sqrt(dx*dx + dy*dy);
+      if (dist < 100) {
+        this.x += (dx / dist) * 1.5;
+        this.y += (dy / dist) * 1.5;
+      }
+    }
+    draw() {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(74,222,128,${this.alpha})`;
+      ctx.fill();
+    }
+  }
 
-            </div>
+  function init() {
+    resize();
+    particles = Array.from({ length: 90 }, () => new Particle());
+    window.addEventListener('resize', resize);
+    canvas.parentElement.addEventListener('mousemove', e => {
+      const r = canvas.getBoundingClientRect();
+      mouse.x = e.clientX - r.left;
+      mouse.y = e.clientY - r.top;
+    });
+    canvas.parentElement.addEventListener('mouseleave', () => { mouse.x = -999; mouse.y = -999; });
+    loop();
+  }
 
-        </div>
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    // Draw connections
+    for (let i = 0; i < particles.length; i++) {
+      for (let j = i + 1; j < particles.length; j++) {
+        const dx = particles[i].x - particles[j].x;
+        const dy = particles[i].y - particles[j].y;
+        const d = Math.sqrt(dx*dx + dy*dy);
+        if (d < 130) {
+          ctx.beginPath();
+          ctx.strokeStyle = `rgba(74,222,128,${0.15 * (1 - d/130)})`;
+          ctx.lineWidth = 0.8;
+          ctx.moveTo(particles[i].x, particles[i].y);
+          ctx.lineTo(particles[j].x, particles[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(loop);
+  }
+  init();
+})();
 
-    </section>
+// ── ABOUT CANVAS (DNA Helix wave) ──
+(function() {
+  const canvas = document.getElementById('aboutCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, t = 0;
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize();
+  window.addEventListener('resize', resize);
 
-    <!-- How It Works -->
-    <section id="works" class="py-20 bg-gray-100">
+  function loop() {
+    ctx.clearRect(0, 0, W, H);
+    t += 0.02;
+    const n = 60;
+    for (let i = 0; i < n; i++) {
+      const progress = i / n;
+      const x = progress * W;
+      const y1 = H/2 + Math.sin(progress * Math.PI * 4 + t) * 80;
+      const y2 = H/2 + Math.sin(progress * Math.PI * 4 + t + Math.PI) * 80;
+      const alpha = 0.3 + 0.7 * progress;
 
-        <div class="max-w-6xl mx-auto px-6">
+      ctx.beginPath(); ctx.arc(x, y1, 4, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(74,222,128,${alpha})`; ctx.fill();
 
-            <h2 class="text-4xl font-bold text-center">
-                How It Works
-            </h2>
+      ctx.beginPath(); ctx.arc(x, y2, 4, 0, Math.PI*2);
+      ctx.fillStyle = `rgba(163,230,53,${alpha})`; ctx.fill();
 
-            <div class="grid md:grid-cols-3 gap-10 mt-12">
+      if (i % 4 === 0) {
+        ctx.beginPath(); ctx.moveTo(x, y1); ctx.lineTo(x, y2);
+        ctx.strokeStyle = `rgba(255,255,255,0.08)`; ctx.lineWidth = 1; ctx.stroke();
+      }
+    }
 
-                <div class="text-center">
-                    <div class="text-7xl">📷</div>
-                    <h3 class="font-bold text-2xl mt-4">
-                        Upload Image
-                    </h3>
-                    <p class="mt-2 text-gray-600">
-                        Upload a crop image from your device.
-                    </p>
-                </div>
+    // Grid lines
+    ctx.strokeStyle = 'rgba(34,197,94,0.05)'; ctx.lineWidth = 1;
+    for (let y = 0; y < H; y += 30) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    }
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
 
-                <div class="text-center">
-                    <div class="text-7xl">🤖</div>
-                    <h3 class="font-bold text-2xl mt-4">
-                        AI Analysis
-                    </h3>
-                    <p class="mt-2 text-gray-600">
-                        AI processes and analyzes the crop image.
-                    </p>
-                </div>
+// ── CTA CANVAS (Sparkles) ──
+(function() {
+  const canvas = document.getElementById('ctaCanvas');
+  const ctx = canvas.getContext('2d');
+  let W, H, sparks = [];
+  function resize() { W = canvas.width = canvas.offsetWidth; H = canvas.height = canvas.offsetHeight; }
+  resize(); window.addEventListener('resize', resize);
 
-                <div class="text-center">
-                    <div class="text-7xl">📊</div>
-                    <h3 class="font-bold text-2xl mt-4">
-                        Get Results
-                    </h3>
-                    <p class="mt-2 text-gray-600">
-                        View disease predictions and treatment suggestions.
-                    </p>
-                </div>
+  class Spark {
+    constructor() { this.reset(); }
+    reset() {
+      this.x = Math.random() * W; this.y = H + 10;
+      this.vy = -(Math.random() * 1.5 + 0.5);
+      this.vx = (Math.random() - 0.5) * 0.5;
+      this.alpha = Math.random() * 0.6 + 0.2;
+      this.size = Math.random() * 3 + 1;
+    }
+    update() {
+      this.x += this.vx; this.y += this.vy;
+      this.alpha -= 0.004;
+      if (this.alpha <= 0) this.reset();
+    }
+    draw() {
+      ctx.globalAlpha = this.alpha;
+      ctx.fillStyle = `hsl(${120 + Math.random()*40}, 80%, 65%)`;
+      ctx.fillRect(this.x, this.y, this.size, this.size);
+    }
+  }
+  sparks = Array.from({ length: 60 }, () => new Spark());
+  function loop() {
+    ctx.clearRect(0, 0, W, H); ctx.globalAlpha = 1;
+    sparks.forEach(s => { s.update(); s.draw(); });
+    requestAnimationFrame(loop);
+  }
+  loop();
+})();
 
-            </div>
+// ── COUNTER ANIMATION ──
+function animateCounters() {
+  document.querySelectorAll('.stat-num[data-target]').forEach(el => {
+    const target = +el.dataset.target;
+    const suffix = el.textContent.replace(/\d/g,'');
+    let current = 0;
+    const step = target / 60;
+    const timer = setInterval(() => {
+      current = Math.min(current + step, target);
+      el.textContent = Math.round(current) + suffix;
+      if (current >= target) clearInterval(timer);
+    }, 20);
+  });
+}
 
-        </div>
+// ── SCROLL REVEAL ──
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      if (entry.target.closest('.stats') || entry.target.classList.contains('stat-item')) {
+        animateCounters();
+      }
+    }
+  });
+}, { threshold: 0.1 });
 
-    </section>
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-    <!-- Benefits -->
-    <section id="benefits" class="py-20 bg-green-50">
+// Stats section observer for counter
+const statsObserver = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) { animateCounters(); statsObserver.disconnect(); } });
+}, { threshold: 0.3 });
+const statsSection = document.querySelector('.stats');
+if (statsSection) statsObserver.observe(statsSection);
 
-        <div class="max-w-6xl mx-auto px-6">
-
-            <h2 class="text-4xl font-bold text-center">
-                Benefits
-            </h2>
-
-            <div class="grid md:grid-cols-2 gap-6 mt-12">
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    ✅ Early Disease Detection
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    ✅ Increased Crop Yield
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    ✅ Reduced Financial Losses
-                </div>
-
-                <div class="bg-white p-6 rounded-xl shadow">
-                    ✅ Easy To Use Interface
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- Statistics -->
-    <section class="py-20 bg-green-700 text-white">
-
-        <div class="max-w-6xl mx-auto px-6">
-
-            <div class="grid md:grid-cols-4 text-center gap-8">
-
-                <div>
-                    <h1 class="text-5xl font-bold">95%</h1>
-                    <p>Accuracy</p>
-                </div>
-
-                <div>
-                    <h1 class="text-5xl font-bold">20+</h1>
-                    <p>Diseases Supported</p>
-                </div>
-
-                <div>
-                    <h1 class="text-5xl font-bold">24/7</h1>
-                    <p>Availability</p>
-                </div>
-
-                <div>
-                    <h1 class="text-5xl font-bold">1000+</h1>
-                    <p>Images Analyzed</p>
-                </div>
-
-            </div>
-
-        </div>
-
-    </section>
-
-    <!-- CTA -->
-    <section class="py-20 text-center bg-white">
-
-        <h2 class="text-5xl font-bold text-gray-800">
-            Protect Your Crops Today
-        </h2>
-
-        <p class="mt-4 text-gray-600 text-lg">
-            Let AI help you identify crop diseases before they spread.
-        </p>
-
-        <button class="mt-8 bg-green-700 text-white px-8 py-4 rounded-xl hover:bg-green-800">
-            Start Detection
-        </button>
-
-    </section>
-
-    <!-- Footer -->
-    <footer id="contact" class="bg-gray-900 text-white py-10">
-
-        <div class="text-center">
-            <h2 class="text-2xl font-bold">
-                AI Crop Disease Detector
-            </h2>
-
-            <p class="mt-4">
-                Helping farmers with Artificial Intelligence.
-            </p>
-
-            <p class="mt-4 text-gray-400">
-                © 2026 All Rights Reserved.
-            </p>
-        </div>
-
-    </footer>
-
+// ── FEATURE CARD MOUSE GLOW ──
+document.querySelectorAll('.feature-card').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * 100;
+    const y = ((e.clientY - r.top) / r.height) * 100;
+    card.style.setProperty('--mx', x + '%');
+    card.style.setProperty('--my', y + '%');
+  });
+});
+</script>
 </body>
 </html>
-
